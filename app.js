@@ -1,6 +1,6 @@
 // Wishlistz Chatbot JavaScript
 
-// Get DOM elements
+// DOM Elements
 const messageInput = document.getElementById('messageInput');
 const sendButton = document.getElementById('sendButton');
 const chatMessages = document.getElementById('chatMessages');
@@ -12,7 +12,7 @@ const minimizedChat = document.getElementById('minimizedChat');
 const themeToggle = document.getElementById('themeToggle');
 const quickActions = document.querySelectorAll('.quick-action');
 
-// Bot response arrays
+// Bot Responses
 const botResponses = [
   "Welcome to Wishlistz 🛍️",
   "Men, Women or Kids?",
@@ -45,7 +45,7 @@ const imageResponses = [
   "🎨 Product image saved to wishlist ❤️!"
 ];
 
-// Helper: Time
+// Helpers
 function getCurrentTime() {
   const now = new Date();
   let hours = now.getHours();
@@ -56,12 +56,10 @@ function getCurrentTime() {
   return `${hours}:${minutes} ${ampm}`;
 }
 
-// Helper: File extension
 function getFileExtension(filename) {
   return filename.slice((filename.lastIndexOf(".") - 1 >>> 0) + 2).toLowerCase();
 }
 
-// Helper: File icon
 function getFileIcon(extension) {
   const iconMap = {
     'pdf': '📄',
@@ -75,7 +73,6 @@ function getFileIcon(extension) {
   return iconMap[extension] || '📎';
 }
 
-// Helper: File size
 function formatFileSize(bytes) {
   if (bytes === 0) return '0 Bytes';
   const k = 1024;
@@ -84,18 +81,26 @@ function formatFileSize(bytes) {
   return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
 }
 
-// Helper: Is image
 function isImageFile(filename) {
   const ext = getFileExtension(filename);
   return ['jpg', 'jpeg', 'png'].includes(ext);
 }
 
-// Scroll to bottom
 function scrollToBottom() {
   chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 
-// Add message
+function getRandomBotResponse() {
+  return botResponses[Math.floor(Math.random() * botResponses.length)];
+}
+function getRandomFileResponse() {
+  return fileResponses[Math.floor(Math.random() * fileResponses.length)];
+}
+function getRandomImageResponse() {
+  return imageResponses[Math.floor(Math.random() * imageResponses.length)];
+}
+
+// Add text message
 function addMessage(text, isUser = false) {
   const messageDiv = document.createElement('div');
   messageDiv.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
@@ -219,22 +224,13 @@ function removeTypingIndicator() {
   if (typingIndicator) typingIndicator.remove();
 }
 
-function getRandomBotResponse() {
-  return botResponses[Math.floor(Math.random() * botResponses.length)];
-}
-function getRandomFileResponse() {
-  return fileResponses[Math.floor(Math.random() * fileResponses.length)];
-}
-function getRandomImageResponse() {
-  return imageResponses[Math.floor(Math.random() * imageResponses.length)];
-}
-
+// Bot response logic
 function sendBotResponse(isFileUpload = false, isImageUpload = false) {
   showTypingIndicator();
   const thinkingTime = Math.random() * 1000 + 1000;
   setTimeout(() => {
     removeTypingIndicator();
-    let botMessage = isImageUpload
+    const botMessage = isImageUpload
       ? getRandomImageResponse()
       : isFileUpload
       ? getRandomFileResponse()
@@ -243,6 +239,7 @@ function sendBotResponse(isFileUpload = false, isImageUpload = false) {
   }, thinkingTime);
 }
 
+// File upload handler
 function handleFileUpload(event) {
   const file = event.target.files[0];
   if (!file) return;
@@ -262,6 +259,7 @@ function handleFileUpload(event) {
   fileInput.value = '';
 }
 
+// Send message
 function handleSendMessage() {
   const messageText = messageInput.value.trim();
   if (messageText === '') return;
@@ -295,13 +293,13 @@ if (messageInput.value.trim() === '') {
   sendButton.style.cursor = 'not-allowed';
 }
 
-// Theme Toggle
+// Theme toggle
 themeToggle.addEventListener('click', () => {
   document.body.classList.toggle('light-mode');
   themeToggle.textContent = document.body.classList.contains('light-mode') ? '🌞' : '🌓';
 });
 
-// Minimize and Restore
+// Minimize and restore
 minimizeButton.addEventListener('click', () => {
   chatContainer.style.display = 'none';
   minimizedChat.classList.remove('hidden');
@@ -311,7 +309,7 @@ minimizedChat.addEventListener('click', () => {
   minimizedChat.classList.add('hidden');
 });
 
-// Quick Actions
+// Quick actions
 quickActions.forEach(button => {
   button.addEventListener('click', () => {
     const text = button.textContent;
