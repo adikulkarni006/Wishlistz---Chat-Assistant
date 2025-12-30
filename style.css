@@ -496,6 +496,8 @@ body.light-mode .user-message .message-content {
     background-position-y: 230px !important;
     background-size: 260px !important;
     background-repeat: no-repeat !important;
+    padding-top: 60px !important;
+
   }
 
   .message-content {
