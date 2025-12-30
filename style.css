@@ -475,51 +475,55 @@ body.light-mode .user-message .message-content {
     left: 0 !important;
     right: 0 !important;
     bottom: 12px !important;
-    height: calc(100vh - 24px) !important;         /* Full height for mobile */
-    max-height: calc(100vh - 80px) !important;     /* Prevent overflow if safe areas */
+    height: calc(100vh - 24px) !important;
+    max-height: calc(100vh - 80px) !important;
     border-radius: 16px !important;
     overflow: hidden !important;
     pointer-events: auto;
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
     backdrop-filter: blur(6px);
     transition: all 0.3s ease-in-out;
-    padding-top: 0 !important;                     /* Remove container padding */
+    padding-top: 0 !important;
   }
 
-  /* 🔻 LOWER HEADER HEIGHT */
+  /* 📉 Reduced Header Height */
   .chat-header {
-    height: 48px !important;                       /* Smaller header */
-    padding: 0 12px !important;                    /* Slimmer sides */
+    height: 44px !important;
+    line-height: 44px !important;
+    padding: 0 10px !important;
     display: flex !important;
-    align-items: center !important;                /* Center vertically */
+    align-items: center !important;
     justify-content: space-between !important;
-    font-size: 14px !important;                    /* Adjust font */
-    line-height: 48px !important;
+    font-size: 13.5px !important;
   }
 
-  /* Optional: smaller icons/logo/avatar in header */
+  /* Smaller Icons / Avatar in Header */
   .chat-header img,
   .chat-header .avatar,
   .chat-header svg {
-    height: 32px !important;
-    width: 32px !important;
+    height: 28px !important;
+    width: 28px !important;
   }
 
+  /* 🧹 Reduce Logo Background Space */
   .chat-messages {
     background-attachment: scroll !important;
     background-position: center !important;
-    background-position-y: 190px !important;       /* Adjusted for new header size */
-    background-size: 240px !important;
+    background-position-y: 140px !important; /* moved up */
+    background-size: 200px !important;       /* reduced size */
     background-repeat: no-repeat !important;
-    padding-top: 48px !important;                  /* Push content below header */
+    padding-top: 44px !important;            /* match header height */
   }
 
+  /* 📩 Reduce bubble max width */
   .message-content {
-    max-width: 82%;
+    max-width: 78% !important;
   }
 
+  /* 🔻 Reduce Quick Actions bar space */
   .quick-actions {
-    padding: 8px 0;
+    margin-top: -4px !important;
+    padding: 4px 0 !important;
   }
 }
 
