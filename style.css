@@ -483,6 +483,7 @@ body.light-mode .user-message .message-content {
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
   backdrop-filter: blur(6px);
   transition: all 0.3s ease-in-out;
+  padding-top: 60px !important;
 }
 
   .chat-messages {
