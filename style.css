@@ -372,3 +372,19 @@ body.light-mode .user-message .message-content {
   background: #fee2e2;
   color: #991b1b;
 }
+
+@media (max-width: 768px) {
+  .chatbot-zoom-wrapper {
+    transform: none;
+    width: 100%;
+    height: auto;
+    right: 0;
+    bottom: 0;
+  }
+
+  .chat-container {
+    width: 95%;       /* Adjust to fit mobile screen */
+    height: 70vh;      /* Responsive height */
+    border-radius: 0;  /* Optional: remove rounded corners */
+  }
+}
