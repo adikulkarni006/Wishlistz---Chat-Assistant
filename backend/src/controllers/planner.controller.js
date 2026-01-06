@@ -1,45 +1,65 @@
-import TripPlanner from "../services/planner/tripPlanner.service.js";
-import GiftPlanner from "../services/planner/giftPlanner.service.js";
-import ThemePlanner from "../services/planner/themePlanner.service.js";
+import ChatSession from "../models/ChatSession.js";
+import { handleTripPlanner } from "../services/planner/tripPlanner.service.js";
+import { handleGiftPlanner } from "../services/planner/giftPlanner.service.js";
+// import { handleThemePlanner } from "../services/planner/themePlanner.service.js"; // optional later
 
-export const startTripPlanner = async (req, res) => {
+// ================= TRIP PLANNER =================
+
+export const tripPlannerController = async (req, res) => {
   try {
-    const out = await TripPlanner.start(req.user, req.body);
-    res.json({ success: true, ...out });
-  } catch (err) { res.status(400).json({ success:false, error:err.message }); }
+    const { message, userId = "guest_user" } = req.body;
+
+    let session = await ChatSession.findOne({ userId });
+    if (!session) {
+      session = await ChatSession.create({ userId, lastIntent: "TRIP_PLANNER", context: {} });
+    }
+
+    const reply = await handleTripPlanner(message, session);
+    await session.save();
+
+    res.json({ success: true, reply });
+  } catch (err) {
+    console.error("Trip Planner Error:", err);
+    res.status(400).json({ success: false, error: err.message });
+  }
 };
 
-export const continueTripPlanner = async (req, res) => {
+// ================= GIFT PLANNER =================
+
+export const giftPlannerController = async (req, res) => {
   try {
-    const out = await TripPlanner.continue(req.user, req.body);
-    res.json({ success: true, ...out });
-  } catch (err) { res.status(400).json({ success:false, error:err.message }); }
+    const { message, userId = "guest_user" } = req.body;
+
+    let session = await ChatSession.findOne({ userId });
+    if (!session) {
+      session = await ChatSession.create({ userId, lastIntent: "GIFT_PLANNER", context: {} });
+    }
+
+    const reply = await handleGiftPlanner(message, session);
+    await session.save();
+
+    res.json({ success: true, reply });
+  } catch (err) {
+    console.error("Gift Planner Error:", err);
+    res.status(400).json({ success: false, error: err.message });
+  }
 };
 
-export const startGiftPlanner = async (req, res) => {
-  try {
-    const out = await GiftPlanner.start(req.user, req.body);
-    res.json({ success: true, ...out });
-  } catch (err) { res.status(400).json({ success:false, error:err.message }); }
-};
-
-export const continueGiftPlanner = async (req, res) => {
-  try {
-    const out = await GiftPlanner.continue(req.user, req.body);
-    res.json({ success: true, ...out });
-  } catch (err) { res.status(400).json({ success:false, error:err.message }); }
-};
-
-export const startThemePlanner = async (req, res) => {
-  try {
-    const out = await ThemePlanner.start(req.user, req.body);
-    res.json({ success: true, ...out });
-  } catch (err) { res.status(400).json({ success:false, error:err.message }); }
-};
-
-export const continueThemePlanner = async (req, res) => {
-  try {
-    const out = await ThemePlanner.continue(req.user, req.body);
-    res.json({ success: true, ...out });
-  } catch (err) { res.status(400).json({ success:false, error:err.message }); }
-};
+// ================= THEME PLANNER (OPTIONAL TEMPLATE) =================
+// export const themePlannerController = async (req, res) => {
+//   try {
+//     const { message, userId = "guest_user" } = req.body;
+//
+//     let session = await ChatSession.findOne({ userId });
+//     if (!session) {
+//       session = await ChatSession.create({ userId, lastIntent: "THEME_PLANNER", context: {} });
+//     }
+//
+//     const reply = await handleThemePlanner(message, session);
+//     await session.save();
+//
+//     res.json({ success: true, reply });
+//   } catch (err) {
+//     res.status(400).json({ success: false, error: err.message });
+//   }
+// };

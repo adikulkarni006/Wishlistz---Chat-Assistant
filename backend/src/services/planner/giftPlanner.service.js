@@ -1,40 +1,138 @@
-import PlannerSession from "../../models/PlannerSession.js";
+import { extractNumber } from "../../utils/validators.js";
+import { getTrendingProducts } from "../recommender/trendingRecommender.service.js";
 import Product from "../../models/Product.js";
-import RecommendationLog from "../../models/RecommendationLog.js";
 
-class GiftPlanner {
-  static async start(user, payload) {
-    const { age, relation = "friend", interests = [], budget = 1000 } = payload;
-    const session = await PlannerSession.create({ userId: user._id, type: "gift" });
+export async function handleGiftPlanner(message, session) {
+  const context = session.context || {};
+  const userMessage = message.trim().toLowerCase();
 
-    // simple filter: match tags with interests, price <= budget
-    const query = { price: { $lte: budget } };
-    if (interests.length) query.tags = { $in: interests };
-
-    const products = await Product.find(query).limit(20);
-
-    await RecommendationLog.create({
-      userId: user._id,
-      source: "gift_start",
-      productIds: products.map(p => p._id),
-      metadata: { age, relation, interests, budget, sessionId: session._id }
-    });
-
-    return { sessionId: session._id, suggestions: products.slice(0,6), message: "Gift suggestions generated" };
+  /* ==========================
+     STEP 1: Relation
+  ========================== */
+  if (!context.relation) {
+    session.context = {
+      ...context,
+      relation: message.trim()
+    };
+    await session.save();
+    return "Nice 🙂 What is their age?";
   }
 
-  static async continue(user, payload) {
-    const { sessionId, pickedId } = payload;
-    const session = await PlannerSession.findById(sessionId);
-    if (!session) throw new Error("Session not found");
-
-    // if pickedId present, log and return details
-    if (pickedId) {
-      const product = await Product.findById(pickedId);
-      return { message: "You picked a gift", product };
+  /* ==========================
+     STEP 2: Age
+  ========================== */
+  if (!context.age) {
+    if (userMessage.includes("don't know") || userMessage === "skip") {
+      session.context = {
+        ...context,
+        age: "Not specified"
+      };
+      await session.save();
+      return "Got it! What’s your budget (in ₹)?";
     }
-    return { message: "No pick yet" };
+
+    const age = extractNumber(message);
+
+    if (!age || age <= 0) {
+      return "🎂 Please enter a valid age (e.g. 25) or type skip.";
+    }
+
+    session.context = {
+      ...context,
+      age
+    };
+    await session.save();
+    return "Got it! What’s your budget (in ₹)?";
   }
+
+  /* ==========================
+     STEP 3: Budget (FINAL STEP)
+  ========================== */
+  if (!context.budget) {
+    if (userMessage.includes("don't know") || userMessage === "skip") {
+      return "💰 Please provide an approximate budget so I can suggest gifts.";
+    }
+
+    const budget = extractNumber(message);
+
+    if (!budget || budget <= 0) {
+      return "💰 Please enter a valid budget amount (e.g. 2000).";
+    }
+
+    // Save budget
+    session.context = {
+      ...context,
+      budget
+    };
+
+    /* ==========================
+       BASE PLANNER ITEMS (DB)
+    ========================== */
+    const products = await Product.find({
+      price: { $lte: budget }
+    }).limit(5);
+
+    if (!products.length) {
+  // DO NOT end planner
+  return "😕 I couldn’t find gifts in this budget. Please try a higher amount.";
 }
 
-export default GiftPlanner;
+
+    const baseItems = products.map(p => ({
+      id: p._id,
+      name: p.name,
+      price: p.price,
+      imageUrl: p.imageUrl,
+      reason: `₹${p.price} • ${p.category}`
+    }));
+
+    /* ==========================
+       TRENDING RECOMMENDER
+    ========================== */
+    let trendingItems = [];
+    try {
+      const trending = await getTrendingProducts();
+
+      trendingItems = trending.map(item => ({
+        id: item._id || null,
+        name: item.name,
+        reason: "Trending right now 🔥"
+      }));
+    } catch (err) {
+      console.error("Trending recommender failed:", err.message);
+    }
+
+    /* ==========================
+       FINAL ITEMS
+    ========================== */
+    const finalItems = [...baseItems, ...trendingItems];
+
+    /* ==========================
+       STRUCTURED RESPONSE
+    ========================== */
+    const finalResponse = {
+      type: "PLANNER",
+      title: "🎁 Gift Suggestions",
+      message: `Based on your inputs:
+• Relation: ${session.context.relation}
+• Age: ${session.context.age}
+• Budget: ₹${session.context.budget}`,
+      items: finalItems,
+      followUp: "You can say: add first one to wishlist ❤️"
+    };
+
+    /* ==========================
+       SAVE FOR WISHLIST FLOW
+    ========================== */
+    session.context.lastItems = finalItems;
+    session.lastIntent = null;
+    await session.save();
+
+    return finalResponse;
+  }
+
+  /* ==========================
+     FALLBACK
+  ========================== */
+  return "Let me know if you want to plan something else 😊";
+}

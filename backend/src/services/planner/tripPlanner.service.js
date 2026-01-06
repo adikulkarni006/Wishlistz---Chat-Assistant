@@ -1,50 +1,121 @@
-import PlannerSession from "../../models/PlannerSession.js";
+import { extractNumber } from "../../utils/validators.js";
 import Product from "../../models/Product.js";
-import RecommendationLog from "../../models/RecommendationLog.js";
 
-class TripPlanner {
-  // start: ask basics or accept initial payload
-  static async start(user, payload) {
-    // payload can include destination, days, type (beach, city), budget
-    const session = await PlannerSession.create({
-      userId: user._id,
-      type: "trip",
-      productId: null
-    });
+export async function handleTripPlanner(message, session) {
+  const context = session.context || {};
+  const userMessage = message.trim().toLowerCase();
 
-    // simple checklist builder - find items by trip type tags
-    const { type = "general", budget } = payload;
-    const products = await Product.find({ tags: type }).limit(10);
-
-    await RecommendationLog.create({
-      userId: user._id,
-      source: "trip_start",
-      productIds: products.map(p => p._id),
-      metadata: { type, budget, sessionId: session._id }
-    });
-
-    return { sessionId: session._id, suggestions: products.slice(0,5), message: "Suggested items for your trip." };
+  /* ==========================
+     STEP 1: Destination
+  ========================== */
+  if (!context.destination) {
+    session.context = {
+      ...context,
+      destination: message.trim()
+    };
+    await session.save();
+    return "Nice choice! How many days is your trip?";
   }
 
-  // continue: accept answers like 'I have a jacket' or 'add item X'
-  static async continue(user, payload) {
-    const { sessionId, haveItems = [], askFor = 5 } = payload;
-    const session = await PlannerSession.findById(sessionId);
-    if (!session) throw new Error("Session not found");
+  /* ==========================
+     STEP 2: Duration
+  ========================== */
+  if (!context.days) {
+    if (userMessage === "skip" || userMessage.includes("don't know")) {
+      session.context = {
+        ...context,
+        days: "Not specified"
+      };
+      await session.save();
+      return "Which month or season are you traveling?";
+    }
 
-    // recommend items not in haveItems
-    const products = await Product.find({}).limit(20);
-    const filtered = products.filter(p => !haveItems.includes(String(p._id))).slice(0, askFor);
+    const days = extractNumber(message);
 
-    await RecommendationLog.create({
-      userId: user._id,
-      source: "trip_continue",
-      productIds: filtered.map(p => p._id),
-      metadata: { sessionId }
-    });
+    if (!days || days <= 0) {
+      return "📅 Please enter a valid number of days (e.g. 5) or type skip.";
+    }
 
-    return { suggestions: filtered, message: "More items you may want." };
+    session.context = {
+      ...context,
+      days
+    };
+    await session.save();
+    return "Which month or season are you traveling?";
   }
+
+  /* ==========================
+     STEP 3: Season
+  ========================== */
+  if (!context.season) {
+    if (userMessage === "skip" || userMessage.includes("don't know")) {
+      session.context = {
+        ...context,
+        season: "Any"
+      };
+      await session.save();
+      return "Is this a work trip or a casual vacation?";
+    }
+
+    session.context = {
+      ...context,
+      season: message.trim()
+    };
+    await session.save();
+    return "Is this a work trip or a casual vacation?";
+  }
+
+  /* ==========================
+     STEP 4: Travel Type (FINAL)
+  ========================== */
+  if (!context.travelType) {
+    session.context = {
+      ...context,
+      travelType:
+        userMessage === "skip" || userMessage.includes("don't know")
+          ? "casual"
+          : message.trim()
+    };
+
+    /* ==========================
+       FETCH REAL PRODUCTS (DB)
+    ========================== */
+    const products = await Product.find({
+      category: "travel"
+    }).limit(5);
+
+    if (!products.length) {
+      session.lastIntent = null;
+      await session.save();
+      return "😕 I couldn’t find travel products right now.";
+    }
+
+    const items = products.map(p => ({
+      id: p._id,
+      name: p.name,
+      price: p.price,
+      imageUrl: p.imageUrl,
+      reason: "Perfect for your upcoming trip 🧳"
+    }));
+
+    /* ==========================
+       SAVE FOR WISHLIST FLOW
+    ========================== */
+    session.context.lastItems = items;
+    session.lastIntent = null;
+    await session.save();
+
+    return {
+      type: "PLANNER",
+      title: "🧳 Travel Essentials",
+      message: `Based on your ${session.context.days}-day trip to ${session.context.destination}, here are some useful travel items:`,
+      items,
+      followUp: "You can say: add first one to wishlist ❤️"
+    };
+  }
+
+  /* ==========================
+     FALLBACK
+  ========================== */
+  return "Let me know if you want to plan something else 😊";
 }
-
-export default TripPlanner;
