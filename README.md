@@ -1,56 +1,58 @@
-# 🛍️ Wishlistz Backend  
-A modular, scalable backend for the Wishlistz Shopping Assistant Chatbot.  
-Built with **Node.js**, **Express**, and **MongoDB (Mongoose)**.  
+# Wishlistz Backend 🛍️
 
-The system powers intelligent shopping assistance including:
-- Personalized recommendations  
-- Trip/Gift/Theme planning  
-- Chat-based interaction  
-- Navigation inside app  
-- Wishlist & user activity tracking  
+A **modular, scalable backend** for the **Wishlistz Shopping Assistant Chatbot**, built with **Node.js**, **Express**, and **MongoDB (Mongoose)**.
 
----
-
-## 🚀 Features
-
-### 🔹 Chat System  
-- Understands user messages using custom NLU  
-- Supports shopping queries (trending, search, category-based)  
-- Handles planners (Trip, Gift, Theme)  
-- Navigation queries (e.g., "Where is men's section?")  
-
-### 🔹 Planner Engine  
-- **Trip Planner** – suggests checklist + missing items  
-- **Gift Planner** – suggests gifts by age, relation, budget  
-- **Theme Planner** – outfits, decoration, color theme suggestions  
-
-### 🔹 Recommendation Engine  
-- Personalized recommendations  
-- Trending product suggestions  
-- Gap-based recommendations (based on user history & wishlist)  
-
-### 🔹 User & Product Management  
-- Auth (JWT)  
-- Wishlist  
-- UserActivity logs  
-- Product catalog  
-
-### 🔹 MongoDB + Mongoose  
-Clean schemas for all business entities.
+This backend enables an intelligent shopping assistant experience including:
+- Personalized product recommendations
+- Trip / Gift / Theme planning flows
+- Chat-based interaction and navigation
+- Wishlist management and user activity tracking
 
 ---
 
-## 🏗️ System Architecture
+## ✨ Features
 
-Frontend (HTML, CSS, JS)
-↓ API Requests (REST)
+### Chat System
+- Custom NLU-based intent handling
+- Supports shopping queries:
+  - Trending products
+  - Search queries
+  - Category exploration
+- Planner queries:
+  - Trip planner
+  - Gift planner
+  - Theme planner
+- Navigation assistance (example: *“Where is men’s section?”*)
+
+### Planner Engine
+- **Trip Planner**: checklist generation + missing item suggestions  
+- **Gift Planner**: suggestions based on age, relation, and budget  
+- **Theme Planner**: outfit, decoration, and color theme recommendations  
+
+### Recommendation Engine
+- Personalized recommendations based on user behavior
+- Trending and popular product suggestions
+- Gap-based recommendations using wishlist + user history
+
+### User & Product Management
+- JWT authentication
+- Wishlist CRUD
+- User activity logging
+- Product catalog management
+
+### Database Layer
+- MongoDB Atlas integration
+- Clean schema design using Mongoose
+
+---
+
+## 🏗️ Architecture
+
+```text
+Client (Web / App)
+        ↓ REST API
 Node.js + Express Backend
-↓
+        ↓
 Routes → Controllers → Services → Models
-↓
+        ↓
 MongoDB Atlas (wishlistz_chatbot)
-
-yaml
-Copy code
-
----
