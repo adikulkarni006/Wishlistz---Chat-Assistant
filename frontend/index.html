@@ -5,10 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Wishlistz - Chat Assistant</title>
   <link rel="stylesheet" href="style.css" />
+  <link rel="icon" href="Wishlistz_Small_Logo.jpeg" type="image/jpeg">
 </head>
-
 <body>
-
   <!-- Minimized Chat Icon -->
   <div id="minimizedChat" class="minimized-chat hidden">
     <img src="Wishlistz_Small_Logo.jpeg" alt="Wishlistz Logo" class="minimized-logo" />
@@ -19,12 +18,10 @@
   <div class="chatbot-zoom-wrapper">
     <!-- Main chatbot container -->
     <div class="chat-container" id="chatContainer" style="display: none;">
-
       <!-- Chat Header -->
       <div class="chat-header">
         <div class="header-content">
           <img src="Wishlistz_Small_Logo.jpeg" alt="Wishlistz Logo" class="bot-avatar-img" />
-
           <div class="header-info">
             <h1 class="bot-name">Wishlistz</h1>
             <span class="status">
@@ -32,7 +29,6 @@
               Online
             </span>
           </div>
-
           <div style="margin-left: auto; display: flex; gap: 8px;">
             <button id="themeToggle" class="theme-toggle" title="Change Theme">🌓</button>
             <button id="minimizeButton" class="minimize-toggle" title="Minimize">✖️</button>
@@ -42,19 +38,16 @@
 
       <!-- Chat Messages Area -->
       <div class="chat-messages" id="chatMessages">
-
         <!-- HOME SCREEN -->
         <div class="home-screen" id="homeScreen">
-
           <!-- Chat with us -->
           <div class="home-card" id="chatWithUsCard">
             <h3 class="home-title">Chat with us</h3>
-
             <div class="agent-box">
               <div class="agent-avatar">W</div>
               <div class="agent-info">
                 <p class="agent-name">Wishlistz Helpdesk</p>
-                <p class="agent-sub">Welcome to Wishlistz Helpdesk...</p>
+                <p class="agent-sub">Welcome to Wishlistz Helpdesk. Click to start conversation</p>
               </div>
             </div>
           </div>
@@ -65,7 +58,6 @@
               <h3 class="home-title">Frequently Asked Questions</h3>
               <button class="faq-search-btn" id="faqOpenBtn" title="Open FAQ">⛶ ⌕</button>
             </div>
-
             <div class="faq-box">
               <div class="faq-icon">F</div>
               <div class="faq-info">
@@ -73,22 +65,18 @@
               </div>
             </div>
           </div>
-
         </div>
 
         <!-- FAQ SCREEN -->
         <div class="faq-screen hidden" id="faqScreen">
-
           <div class="faq-topbar">
             <button class="faq-back-btn" id="faqBackBtn" title="Back">←</button>
             <img src="Wishlistz_Small_Logo.jpeg" class="faq-widget-logo" alt="Logo">
             <p class="faq-top-title">Search for Answers</p>
           </div>
-
           <div class="faq-search-wrap">
             <input type="text" id="faqSearchInput" placeholder="Search for answers..." />
           </div>
-
           <div class="faq-category">
             <div class="faq-cat-icon">F</div>
             <div class="faq-cat-text">
@@ -96,34 +84,16 @@
               <p class="faq-cat-sub">Find answers to common questions</p>
             </div>
           </div>
-
           <div class="faq-list" id="faqList"></div>
-
         </div>
-
-        <!-- Footer Powered by Freshchat -->
-        <div class="chat-footer-brand" id="chatFooterBrand">
-          Powered by&nbsp;
-          <a
-            href="https://www.freshworks.com/live-chat-software/powered-by-freshchat/"
-            class="product"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <img src="freshchat-icon.png" class="freshchat-img" alt="Freshchat" />
-            Freshchat
-          </a>
-        </div>
-
       </div>
 
       <!-- Quick Actions -->
       <div class="quick-actions"></div>
 
       <!-- Chat Input Area -->
-      <div class="chat-input-container" id="chatInputArea">
+      <div class="chat-input-container hidden" id="chatInputArea">
         <div class="input-wrapper">
-
           <input
             type="file"
             id="fileInput"
@@ -131,14 +101,12 @@
             accept="image/jpeg,image/jpg,image/png,.pdf,.doc,.docx,.txt"
             hidden
           />
-
           <button id="attachButton" class="attach-button" title="Attach file or image">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                  stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
             </svg>
           </button>
-
           <input
             type="text"
             id="messageInput"
@@ -146,7 +114,6 @@
             placeholder="Type your message…"
             autocomplete="off"
           />
-
           <button id="sendButton" class="send-button" title="Send">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                  stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -154,10 +121,23 @@
               <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
             </svg>
           </button>
-
         </div>
       </div>
 
+      <!-- Footer Powered by Freshchat -->
+      <div class="chat-footer-brand" id="chatFooterBrand">
+        Powered by&nbsp;
+        <a
+          href="https://www.freshworks.com/live-chat-software/powered-by-freshchat/"
+          class="product"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <img src="freshchat-icon.png"
+               class="freshchat-img" alt="Freshchat" />
+          Freshchat
+        </a>
+      </div>
     </div>
   </div>
 
